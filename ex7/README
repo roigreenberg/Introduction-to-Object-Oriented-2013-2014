@@ -1,0 +1,169 @@
+roigreenberg
+yosstos
+
+roi greenberg 305571234
+Yossi Bachar 205688971
+README for ex7
+=====================
+= File Description =
+=====================
+README- This file
+
+main:
+	Sjavac.java: 	the manager, it runs all the program
+	Parser.java:	run over the line and check their correctness.
+					create variables of some kind of line for later	checks 
+	compiler.java: 	run right after the parser and check the correctness of the 
+					remind code lines
+	blocks.java: 	class to save the lines of if/while/method block for later use
+	SjavaException.java: 	the super class for all excaptions
+	DuplicateDeclarationExcaption.java: excaption in case of duplicate element
+	NoSuchElementExcaption.java:  No such element excaption
+
+arraToCompiler:
+	MethodParams.java: 		class for method parameters
+	MethodReturn.java: 		class for method returns
+	VariableAsaign.java: 	class for variables assignment
+	MethodCall.java: 		class for method calls 
+
+
+Variables:
+	Variables.java:		the super class of the variables
+	ArrayVar.java: 		decorator class for array variable
+	BooleanVar.java: 	class for boolean variable
+	CharVar.java: 		class for char variable
+	DoubleVar.java: 	class for double variable
+	IntVar.java: 		class for int variable
+	StringVar.java: 	class string array variable
+	VarFactory.java: 	the factory that creates the right variables
+	WrongValueTypeExcaption.java: excaption in case the value type is wrong
+
+
+Methods:
+	Methods.java: 		the super class of the methods
+	ArrayMethod.java: 	class for array returning methods
+	BooleanMethod.java: class for boolean returning methods
+	CharMethod.java: 	class for char returning methods
+	DoubleMethod.java: 	class for double returning methods
+	IntMethod.java: 	class for int returning methods 
+	StringMethod.java: 	class for string returning methods
+	VoidMethod.java: 	class for not returning methods
+	MethodFactory.java: the factory that creates the right method
+	WrongParametersExcaption.java: excaption in case the given parameters are wrong
+	WrongReturnStatementExcaption.java: excaption in case the return statement is wrong
+
+
+=========
+= Design=
+=========
+
+the design we  choose to follow is very similar to ex6 design.
+We use 2 classes for the main operation. Parser and Compiler.
+Idealy, tha Parser would have done only the reading lines and then the Compiler
+check the correctness of the action. But since the actions are not exactly linear
+with the lines (some line shoould being taking care of before preview lines) we 
+desided that tha Parser will Also do some of the actions checks.
+the Parser recieve an Array of String of code lines then read it one by one.
+We create regex of every pattern of correct line the check each option. if none
+beign true we return Error.
+Since we first need to know every variables and methods on the Parser itself every
+new variable or method is taking care of. which mean we create the variable 
+represent the existing var/method with the factories and add it to the ArrayList
+each save it.
+Also in case of methods, we run and save their parameters list.
+As we mention before some thing need to be take care later so for each method/if
+/while block we save their internal code line in a Block class and after finish 
+the outer block we run over the blocks.
+the action of variable assignment and method call are saved in Arrays for later 
+use also because of the mentioned reason.
+After finish the each Parser block it create a compiler with the Arrays we saved.
+Then the manager go over the arrays and take care of each part.
+
+for checking the validity of conditions we create a boolean variable and use it 
+to make sure the condition is of type of boolean.
+Same way for the index of an array.(with int variable)
+
+We also save the information about the block type so I check only the relevent
+line (for example, return is only inside a method).
+
+We use 2 Arrays for the variables, for local variables and globals, and every 
+function need to know the variables(such as check if assignment value is correct)
+get 2 different arrays.
+we did so because there are times that we need to check only one type of variables
+like decleration of new variable inside a method that need to check for already 
+exist variable only in the local variables.
+(in such case the argument we give the function is a new empty array). 
+
+The classes for the variable and method save mostly general informaition as name 
+and type and have the abeality to check correctness of value for the type of
+variable/method.
+those class are the only one who care about the type of the variable/method in 
+order to keep the oop principles.
+
+for most of the var/method the correctness check is same except the type so we
+implement the fanction of the super class Variables/Methods and for those how 
+act different(as array or void method) we override the functions.
+
+In case of wrong code we throw excaption that being catch by the manager then 
+print the massage and "1". 
+there are several type of excaption. each excaption print(system.err) an informative
+message
+in case no problem found the manager will print "0". 
+in case of wrong file the manager will print "2". 
+
+========================
+= Answers to questions =
+========================
+6.1
+Error handling
+As mentioned above we use excaption for error handling.
+In some places we use try-catch and some time if-else for the excaption. according
+to the situation and our way to "know" the excaption.
+We chose to do it this way because it easy way to finish the program run since
+it should stop right after an error.
+also it gave as the ability of supposdly not handle an error by knowing that 
+the function we just call will handle it.
+Also as mentioned above each excaption  print(system.err) an informative
+message according to it's nature.
+
+6.2.1
+adding a new variable type is very simple.
+we just need to create it proper class and add it to the factory.
+in case of special behavior we might need to Override some of the super class
+method. (as if short also can get int type or thing like that)
+
+6.2.2
+to support an if-else block, assuming there is no special condition of the behavior 
+of Sjava if-else mechanism.
+In case that we need to consider ALL the if-else's as big block we just add the 
+method that create the if block's the proper terms to continue run over the second if
+In case that we need to consider each one as all new if block we add condition for
+end the block when arrive to 'else' line and start a new block.
+No new class is needed for that.
+Note that WE can't know all the demend for such structure so It possible we might 
+miss something but as far as we can think of the way we implement the programm can
+handle it very easly.
+
+6.3
+We didn't really use charAt functions, and barly substring() but mostly regexs.
+  
+We use many many regex and it hard to point for the main's one but those that 
+reapet the most are:
+
+Method name = "([a-zA-Z][\\w]*)"
+And Variable name = "(_\\w+|[a-zA-Z][\\w]*)"
+
+=========================
+= Implementation issues =
+=========================
+
+This time, we have some issues.
+I will state the main one.
+
+We had problem in case of inner scope which allow "duplicate" global variables.
+To solve that we use 2 lists of variables, local and not, so when we need to
+compare existance only with the local we can do it easly.
+Another small thing of that kind, was in the willing to do method that can 
+work on many situations, we decided to craete an empty variable list so in case
+we need to use a method such createVariable but we don't care about the existing
+variable we can give an empty list as parameter. 

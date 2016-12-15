@@ -1,0 +1,38 @@
+roigreenberg
+
+
+##################
+File Description
+##################
+
+BinaryMathTerm.java - represents a term composed of exactly two independent
+BracketsMathTerm.java - represents a math term between brackets
+FractionMathTerm.java - epresents a special case of binary math term
+MathTerm.java - This class represents the base class for all other MathTerms classes
+SimpleBinaryOpMathTerm.java - represents a simple operation between two other terms
+SimpleMathTerm.java - represents a math term which is either a single letter variable or a number
+SumMathTerm.java - represents a mathematical sum
+README - this file
+
+########
+Design
+########
+
+I done as the instraction says.
+Since exponent, barred and negated can use for any sub-class of mathTerm I chose
+to implement it in the mathTerm class itself.
+
+
+#######################
+Implementation Issues
+#######################
+
+None
+
+
+######################
+answer to question
+######################
+if I want to do integral, I will do it same as the SUM term.
+a class that extend mathTerm and will have 4 parameters. the lower limit, the upper limit,
+ the integrad and the difrantial

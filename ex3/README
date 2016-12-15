@@ -1,0 +1,133 @@
+roigreenberg
+
+
+##################
+File Description
+##################
+
+SpaceShip.java - implement the masterclass of the spaceships
+SpaceShipFactory - convert the user input to spaceships
+Aggressive - implement the aggressive spaceships (extend spaceships)
+Basher - implement the basher spaceships (extend spaceships)
+Drunkard - implement the drunkard spaceships (extend spaceships)
+Humen - implement the humen spaceships (extend spaceships)
+spacial - implement the special spaceships (extend spaceships)
+README - this file
+
+########
+Design
+########
+
+The design I choose to implement is that:
+I implement most of the the code for the spaceships in the master-class SpaceShip
+which I choose to make an abstract class, so I could make sure every sub-class 
+of a ship will have to implement the method 'doAction' which is different for 
+every kind of spaceship but also the masterclass itself implement most off the 
+require methods that are mostly the same for all or most af the spaceships.
+In addition the spaceship class provide the constructor that give the ship 
+it initial position
+
+Inherete from the SpaceShip class are oll the ships classes.
+
+All of them are overriding doAction and execute there the method they do in the
+game:
+
+Humen class - this class inheret 1.teleport, 2.fire and 3.shield and execute 
+                them in case the condition are good
+		Also it's override the methods 1.getMove, since it's behavior is
+                 entirly different from ather ships
+		and 2.getImage to display the uniqe image of the user ship.
+
+Aggressive class - this class inheret 1.getMove which it execute exactly as it 
+                    implement in SpaceShip and 
+               	2.fire which it execute in case the condition are good.
+
+Basher class - this class inheret 1.getMove which it execute exactly as it 
+                implement in SpaceShip and 
+		2.shieldOn which it execute in case the condition are good.
+
+Runner class - this class inheret 1.getMove but unlike the previews ship, it work
+                on opposite way meaning it run away instead of casing. to do so, 
+                in it constructor it switch between the right and left value and
+                then the getMove method will work as needed without need to 
+                override it.
+		2. teleport  which it execute in case the condition are good.
+
+Drunkard class - this class include lots of variable to determine and save it 
+                randomly behavior.
+		this class inheret 1.teleport, 2.fire and 3.shield and execute 
+                them in case the condition are good.
+		also it's override the methods getMove, since it's move randomly
+
+Special class - this class behevior is to behave the same as the closest ship. 
+                there for it inheret all of methods and using
+		them according to the closest ship as describe in the other ship's
+                class above.
+		since some ships are overriding getMove and some not, I decided 
+                not to override it but implement it(in case of overriding) as 
+                part of doAction and not as standalone method.
+		
+
+While I start to wrote the code, I had notice that most of the methods are exactly 
+the same for all the ship and the diffrances are mostly the term that determine 
+if to activate the mathods or opposite directions(in case of 'getMove' method)
+
+The advantage in such design is that I had very few code repeatition. I almost 
+didn't had to override a method(s) for a spesific ship and only execute the method 
+in the term of every ship. almost every ship class has very short code
+The disadvantage may be that most of the code is in the class spaceShip whice
+made it very long code.
+
+
+The Drunkard class- 
+
+I decided to implement this ship in that way:
+1. The ship behavior will be in "session"s.
+2. I reset a counter that count the rounds. and draw a number that will determine 
+    the length(in rounds) of the next "session"
+3. Every "session" I draw if the ship will try to teleport, accelerate, active 
+    shield and also it draw if to turn or not.
+4. Every "session", teleporting, shielding and firing(in case of draw as true) 
+    will try to execute every square of the length of the session 
+    (for example, if session length is 100 rounds, and teleport draw as true, 
+    it will try to teleport after 10 rounds, 20 rounds and so.
+    if the length is 300, it will try after 17 rounds, 34 and so on)
+5. after the session end(after X rounds when X is the length of the session)  
+    it will draw again all the parameter above and a new session length
+
+*To make sure every session last a while but not to much, I choose to make 2 constant.
+ a starting point(which I choose now as 150) and a range(which I choose to be 200).
+ that make sure every session will be between 150 to 350 rounds.
+
+The Special class - 
+
+I decided that the spacial ship will act in that way:
+every rount it will check what is the type of the closest ship, and will act with
+that ship behavior (for example, if it close to the basher, it will act like basher)
+in case 2 special ship are closest one to each other, they will try to teleport.
+
+
+#######################
+Implementation Issues
+#######################
+
+when I start writing the special class code, I had difficulte how to "know" what 
+is the closest ship class so I could behave the same.
+After lot of thinking I choose to use the 'toString' method which I originaly made
+only for the testers and use Switch-Case to exectue
+different method for each situation.
+Also in case it close to a Drunkard ship, in order to avoid copying the entire 
+long code I create a varieble of a Drunkard ship and used 
+it parameters.
+
+Another minor thing, while writing the javadoc, I didn't know how to tag the 
+"override" when needed, so I decided not to tag it so there want be any error 
+while creating the javadoc.
+
+
+The testers - 
+I wrote 2 file of tests. One to the Factory and second for the ships.
+It under the name of HumenTest but it test thing that are exactky the same in 
+every other ship.
+
+the 3rd file, Ex3Suite.java is a file that run both tests file.

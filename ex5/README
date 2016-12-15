@@ -1,0 +1,74 @@
+roigreenberg
+
+
+##################
+File Description
+##################
+
+AvlTree - an implement of Avl Tree
+README - this file
+
+########
+Design
+########
+
+I implement all the code for the AvlTree in the master class of the tree
+
+I chose to build the tree as binary tree and for that I create an inner
+class of nodes which every node has his parent, 2 sons, his own data, height
+and has a methods that calculate the height and balance factor.
+In addition, for the Iterator I create another inner class that implement an 
+iterator. since there was no seen require, it does not implement remove.
+other design describe right below as answer to add() and delete().
+
+the add() method - 
+	after finding the right place to add the new node in the principle of insert
+	to BST tree, I add it and update the size. 
+	Then I go from the node parent to the root and look for 
+	node that became unbalanced (meaning his balance factor bigger then 1 or
+	smaller then -1. (we stop looking after 1 such node is found)
+	then I use a seperate method 'balance' the get the node and using
+	rotations to rebalance the tree.
+	the balance method is using another seperete method to recalculate the heights
+	for the nodes that might have changed
+
+the delete() method -
+	here again, after finding the node place, I update the size, then check
+	the node's sons to decide which way the deletion need to be.
+	There are 3 diffrent situations, 2 of them, in cases the node have at most
+	1 son, and the third if the node has to sons.
+	In the first case, I use seperate method 'deleteFromAvl' that actualy delete
+	the node the recalculate the height if nedded the rebalance the tree using 
+	'balance' method.
+	In case of the third option, I first replace the deleted value with the 
+	succesor value then, use 'deleteFromAvl' to delete the successor node.
+
+Not exactly a helper function, but both method using the contains method 
+in order to know the correct place to add to/delete from.
+Since 'contains' already look for the place in order to know if the value in 
+the tree there is no reason to look from the same spot again. 
+Also as I mentioned, both methods are using 'balance' and 'calcHeight' to 
+	rebalance the tree properly.
+	
+#######################
+Implementation Issues
+#######################
+
+I don't remember having a serious implementation issue.
+
+
+#######################
+   Answer to Q.5
+#######################
+
+the number of node in the tree is the number in the left-sub-tree +
+right-sub-tree + 1(for the root).
+in case we want the minimum number of nodes, it mean one sub tree will be higher
+the other by 1 and both sub-trees will be minimum in heights of (h-1) and (h-2)
+
+in order to create such tree I will insert the following numbers (start with 8):
+ 8, 3, 10, 2, 5, 9, 11, 1, 4, 6, 12, 7 
+ the values are insert level after level without the need to rebalance
+ the order of the insertion make sure the sub-trees of the root are the minimum 
+ avl tree of height of 3 and 2 then with the root I get minimum tree of height 4
+ 

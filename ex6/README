@@ -1,0 +1,103 @@
+roigreenberg
+
+####################
+# File Description #
+####################
+
+package filescript:
+	MyFileScript - the main class
+	Parsing - class that create section according to command file
+	Print - filter, order and print the files
+	Section - class that have filter, order and array for warning
+	SectionErrorException - throw error in case of bad section
+	UsageExcaption - throw error in case of bad usage parameters
+package filters:
+	FilterFactory - create the filter instance
+	FilterNameErrorException - throw error in case of bad name
+	FilterParameterErrorException - throw error in case of bad parameters
+	Filter - interface for the follow classes:
+		SizeFilter - abstract class for the follow classes
+			GreaterThanFilter
+			SmallerThanFilter
+			BetweenFilter
+		BooleanFilter - abstract class for the follow classes
+			ExecutableFilter
+			WritableFilter
+			HiddenFilter
+		StringFilter - abstract class for the follow classes
+			ContainsFilter
+			FileFilter
+			PrefixFilter
+			SuffixFilter
+		AllFilter - default filter
+		NotFilter - decoretor to opposite filters
+package orders:
+	OrderFactory - create the order instance
+	OrderErrorException - throw error in case of bad name
+	Order - interface for the follow classes:
+		AbsOrder - the default order
+		TypeOrder
+		SizeOrder
+		ReverseOrder - decoretor to opposite orders
+
+README - this file
+###################
+# Design + Answer #
+###################
+
+I follow the design offer by the course teem, so I explain it short
+I seperate the work for indevidual classes.
+The main class 'MyFileScript' working in that way:
+	First, The 'Parsing' class read the command file and create array of sections.
+	Then the 'Print' class get this array, and for each section filter the files according
+	to the spesific filter then print them in the spesific order.
+The parser using 2 factories, 1 for the filters and the other for the orders.
+each factory  get a String with name and parameters(not always).
+In case there a problam with the name or parameters the line number will be saved in an array 
+at the section variable and an default filter/order will be create.
+otherwise, the factory will create filter/order as needed.
+The factory are the only classes that know and care which filter/order there are.
+All other classes use the master-class Filter/Order and don't care what the exact filter/order.
+
+For the filters/orders I done an intarface so all the filters/order will implement the same type
+and I would be able to use all filters/orders without the need to know which spesific
+filter/order I have
+Also, I done filter classes for same types of filters.
+for example, all the filters using compration to numbers extend 'SizeFilter' in that way
+I could use 1 constuctor for all the filters.
+In addition I implement 2 decorator,(1 filter, 1 order) that return the opposite of the 
+filter/order they got as parameter.
+All of the filters are implement one method: 'isPass()' which get file and return if it pass
+the filter or not.
+All of the orders are implement Comparator<> and for that have a single method 'compare()' 
+which get 2 files and return the sequense of those file so the class can use as a comparator
+for the method 'Collections.sort(List<T>, Comparator<T>)' on the filtered file array.
+
+
+
+The Excaption - 
+I create several exceptions.
+For Error type 1:
+		In case of bad filter/order name the follow exceptions will throw:
+			FilterNameErrorException
+			OrderErrorException
+		In case of bad parameter for filter the follow exceptions will throw:
+			FilterParameterErrorException
+	In this case, I catch the exception at the parser, saved the problematic line and 
+	create the default filter/order and continue.
+	
+For Error type 2:
+		In case of bad Section headlines the follow exceptions will throw:
+			SectionErrorException
+		In case of bad usage parameters the follow exceptions will throw:
+			UsageErrorException
+	In this case, I catch the exception at the main class, print "ERROR" and finish.
+	
+As I explain above the order classes are implement Comparator so I use ArrayList to hold
+the filtered files and use 'Collections.sort(List<T>, Comparator<T>)' to sort them.
+
+#########################
+# Implementation Issues #
+#########################
+
+I don't remember having a serious implementation issue.

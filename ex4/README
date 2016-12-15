@@ -1,0 +1,210 @@
+roigreenberg
+
+
+##################
+File Description
+##################
+
+SimpleSet.java - an interface of the method add, delete, contains and size.
+SimpleHashSet.java  - an abstract class implementing SimpleSet
+ChainedHashSet.java - a hash-set base on chaining. Extends SimpleHashSet.
+ChainedHashSet.java - a hash-set base on open-adressing with quadric probing.
+					  Extends SimpleHashSet.
+CollectionFacadeSet.java - wrap an object implementing java's Collections 
+						interface with a class that has common type with our
+						own implementaions for sets
+SimpleSetPerformanceAnalyzer.java - has a main method that measures the run-times
+README - this file
+
+########
+Design
+########
+
+For the design I choose to try  as much as I could to write the code in SimpleHashSet
+	class for both hashSet to reduce double in the code.
+	the method 'resize' is implement at SimpleHashSet. it change the capacity variable
+	then call for 'refillTable' to create the updated table. each implementation for itself
+	Also most of the variable is the same in both implementation so they declare there.
+
+Another decision is to seperate the ADD method so the accual adding will be in seperate
+	method(addToSEt). the reason is that when rehsing the entire table there are no need to 
+	check if the key is exist or to check the load factor because we are in state that we
+	accualy just passed the load factor and all the keys we rehashing are already added to 
+	the table before and each of them already unique.
+	
+In case of the ChainedHashSets I start as recommand with ArrayList of LinkedList but then 
+	I find out the using ArrayList instead of the LinkedList return faster result so I
+	change to this implementation.
+	I also find out that if I create the table this an empty ArrayList from the begining
+	it work faster then start with null's and create the array only when needed.
+	
+In case of OpenHashSet I used array of String (string[]).
+	the main issue here were the deletion mechanithem which I describled below
+	Another thing I did in order to reduce the runing time is to calculate the hash only 
+	once. I saw that if when adding and deleting I already calculte the hashcode to see
+	if the key is contain I can use the calculate for adding the or deleting the keys.
+	
+
+All the method are using the principle of the HASH so in avarage it take only O(1)
+for every action.
+
+
+
+#######################
+Implementation Issues
+#######################
+
+Once again, the big issue was the deletion mechanithem at OpenHashSet which describled below
+
+A problem were in case of rehashing the table of OpenHashSet. As I wrote, in this case I
+	didn't use contains so it didn't calculte the hash.
+	to solve it I choose to calculate the hashcode in 'addToSet' method only in case
+	the index of the hash is 0, which in case of rehashing before adding the keys the
+	index is set to 0.
+	Also it mean that at normal add, if the calculate stay with index=0 it also use it
+	again but this will stop at the first time of the while loop so it wont cause a time
+
+
+
+1. I didn't add any extra files.
+2. For implementing the ChainedHashSet, I choose as reccomand to use ArrayList of
+	LinkedLists (I find out using another ArrayLIst will be faster but I have been
+	told that this may cause issues)
+	I create an ArrayList full with empty LinkedList(another decision I made after
+	seeing the diffrences in running time if I start with null and put the list when
+	needed.
+3. The deletion mechanism - I choose to use a technict maybe little unordinary.
+	Each deleted key is replaced by the string "<del>"(can be any other key)
+	so no problem will happend when looking of key.
+	To overcome the problem can be if the above string will be the actual key
+	need to add to the table, I decided to use spacial term for this situation.
+	I create a boolean variable(named "isDelIn") that tell if the string is in the
+	table or not, and every time add,delete, or contains is called, if the key is
+	this, it will follow the spacial terms.
+	contains - searching for the key wont work so it just return the boolean variable.
+	delete - just change the boolean to false(no use the replace it with the same key)
+	add - add normaly, and change the boolean to true
+	When the table need to resize and rehash, first I add every other keys, the if neccery
+	I add the spacial key.
+	a. I test every possible situation to make sure that solution work. I also pass the auto
+		test when this key is "DAST" which is one of the key used in the tests.
+	b. I heard about the solution of using == and equals but I couldn't make it work.
+		maybe because of the way I do the resizing.
+
+4. Analysis result:
+	the time will be in the follow format <milisecond>, <second>, <minutes-if needed>
+	exept for LinkedList all the time's of the contains checks are avarage of 50,000 checks.
+	
+	a. add text1:
+     	i.   ChainedHashSet - 32761 mSec,  32.7 sec,  0.5 min
+		ii.  OpenHashSet    - 164257 mSec, 164 sec, 2.48 min
+		iii. TreeSet        - 56 mSec,     0.056 sec
+		iv.  *LinkedList*   - 5 mSec,     0.005 sec
+		v.   HashSet        - 67 mSec,     0.067 sec
+	b. add text2:
+     	i.   ChainedHashSet - 55 mSec, 0.055 sec
+		ii.  *OpenHashSet*  - 13 mSec, 0.013 sec
+		iii. TreeSet        - 27 mSec, 0.027 sec
+		iv.  *LinkedList*   - 13 mSec,  0.017 sec
+		v.   HashSet        - 17 mSec, 0.017 sec
+	c. text1 vs text2:
+     	i.   ChainedHashSet - 32761 vs 55 mSec
+		ii.  OpenHashSet    - 164257 vs 13 mSec
+		iii. TreeSet        - 56 vs 27 mSec
+		iv.  *LinkedList*   - 5 vs 13 mSec
+		v.   HashSet        - 67 vs 17 mSec
+	d. text1: contains("hi"):
+     	i.   *ChainedHashSet* - 0.00004 mSec
+		ii.  *OpenHashSet*    - 0.00004 mSec
+		iii. TreeSet          - 0.00032 mSec
+		iv.  LinkedList       - 6 mSec
+		v.   HashSet          - 0.00006 mSec
+	e. text1: contains("-13170890158"):
+     	i.   ChainedHashSet - 0.47 mSec
+		ii.  OpenHashSet    - 3.32 mSec
+		iii. TreeSet        - 0.00026 mSec
+		iv.  LinkedList     - 4 mSec
+		v.   *HashSet*      - 0.0002 mSec
+	f. text1: "hi" vs "-13170890158":
+     	i.   ChainedHashSet - 0.00004 vs 0.47 mSec
+		ii.  OpenHashSet    - 0.00004 vs 3.32 mSec
+		iii. TreeSet        - 0.00032 vs 0.00026 mSec
+		iv.  LinkedList     - 6 vs 4 mSec
+		v.   HashSet        - 0.00006 vs 0.0002 mSec
+	g. text2: contains("hi"):
+     	i.   *ChainedHashSet* - 0.00004 mSec
+		ii.  OpenHashSet      - 0.00006 mSec
+		iii. TreeSet          - 0.00012 mSec
+		iv.  LinkedList       - 2 mSec
+		v.   HashSet          - 0.00008 mSec
+	e. text2: contains("23"):
+     	i.   ChainedHashSet - 0.00004 mSec
+		ii.  *OpenHashSet*  - 0.00001 mSec
+		iii. TreeSet        - 0.0001 mSec
+		iv.  LinkedList     - 1 mSec
+		v.   *HashSet*      - 0.00006 mSec
+	f. text2: "hi" vs "23":
+     	i.   ChainedHashSet - 0.00004 vs 0.00004 mSec
+		ii.  OpenHashSet    - 0.00006 vs 0.00001 mSec
+		iii. TreeSet        - 0.00012 vs 0.0001 mSec
+		iv.  LinkedList     - 2 vs 1 mSec
+		v.   HashSet        - 0.00008 vs 0.00006 mSec
+	
+	note: the amazing result in (a) and (b) for LinkedList is mostly because it allow
+		duplicates. otherwise as we see 'contain' for linkedlist is very slow...
+		
+5. the bad result in chainedHashSet, causes from several reason. because we start
+	with small table capacity, there are many resizing and every time take lot of
+	time. another reason, is the time require to add keys to the same spot again 
+	and again. the bigger the ArrayList get, it take more time to add it a new key 
+	because it need to look first if the key is already there.
+   In the OpenHashSet, as before we have the reason of the small starting table.
+   	if we will start with much bigger table capacity, the diffrences will be amazing!
+   	Also, because of the adentical hash code, every next key will take more time to 
+   	calculate the proper hash code, the 100000 key will need to calculate 100000 times!
+  i.   ChainedHashSet -
+  		 advantages: look for key is very fast, add keys with different hash is fast
+  		 cons: very slow in case of same hash keys.  
+  ii.  OpenHashSet    -
+ 		 advantages: the fastest in looking for keys, add keys with different hash is fast
+  		 cons: very very slow in case of same hash keys.  
+  iii. TreeSet        -
+   		 advantages: add keys is fast regardless the hashcode diffrences
+  		 cons: reletivly slow in looking for keys(compare to other set implementation)
+  iv.  LinkedList     -
+   		 advantages: add keys *very* fast.
+  		 cons: very very slow in looking for keys
+  v.   HashSet        -
+   		 advantages: add keys is fast regardless the hashcode diffrences. looking for 
+   		 keys is fast
+  
+  If my need is create a full data structure that allow diplicates, the LinkedList will 
+  	work best but in case we also need to look for keys fast or no duplicates I will prefer
+  	the HashSet.
+  
+  Between my implementaion, as reflected from the result the ChainedHashSet dealling 
+  	better with collied keys but the OpenHashSet it way better when the hashcode is different
+  	In case of looking for keys both gave the best result even compare to java data structures
+  
+  In case of adding the same hashcode keys, I didn't had a chance against java hashSet
+  but in different hashcode, my OpenHashSet bit the java structure. Also in case of looking
+  for keys mine worked fastar.
+  
+  I was very surprise to see the huge diffrance between the time took to add text1 to my 
+  implementation compare to java's.  
+  I wasn't surprise that most of the result of "Contains" take no time and cause me to 
+  do it 50000(!) time to get comparable results. the reason is because it use hash, 
+  if check a spesific location(s) so even full table can be search fast.
+  
+  As I said the result of java structures ws very surprising. espacialy hashSet.
+  explanation for this, exept of better implementation as expected from better programers
+  is that every hash function return diffrent value and it very possible that the function
+  they use does not give the same value to all the keys in text1 which make the copmare
+  "unfair".
+  
+  Using the advises from appendix A indeed make the run-time fasters.
+  Since I also change many other things all the time I can't tell how much this thing helped.
+   
+   
+		
+	
